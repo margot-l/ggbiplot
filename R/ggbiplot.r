@@ -26,8 +26,7 @@
 #' @param obs.scale       scale factor to apply to observations
 #' @param var.scale       scale factor to apply to variables
 #' @param pc.biplot       for compatibility with biplot.princomp()
-#' @param colour_group    optional factor variable indicating the groups that the observations belong to. If provided the points will be colored according to groups
-#' @param shaper_group    optional factor variable indicating the groups that the observations belong to. If provided the points will be shaped according to groups
+#' @param colour.group          optional factor variable indicating the groups that the observations belong to. If provided the points will be colored according to groups
 #' @param ellipse         draw a normal data ellipse for each group?
 #' @param ellipse.prob    size of the ellipse in Normal probability
 #' @param labels          optional vector of labels for the observations
@@ -44,11 +43,11 @@
 #' @examples
 #'   data(wine)
 #'   wine.pca <- prcomp(wine, scale. = TRUE)
-#'   print(ggbiplot(wine.pca, obs.scale = 1, var.scale = 1, groups = wine.class, ellipse = TRUE, circle = TRUE))
+#'   print(ggbiplot(wine.pca, obs.scale = 1, var.scale = 1, colour.group = wine.class, ellipse = TRUE, circle = TRUE))
 #'
 ggbiplot <- function(pcobj, choices = 1:2, scale = 1, pc.biplot = TRUE, 
                       obs.scale = 1 - scale, var.scale = scale, 
-                      colour_group = NULL, shape_group = NULL, ellipse = FALSE, ellipse.prob = 0.68, 
+                      colour.group = NULL, ellipse = FALSE, ellipse.prob = 0.68, 
                       labels = NULL, labels.size = 3, alpha = 1, 
                       var.axes = TRUE, 
                       circle = FALSE, circle.prob = 0.69, 
@@ -129,12 +128,8 @@ ggbiplot <- function(pcobj, choices = 1:2, scale = 1, pc.biplot = TRUE,
   }
 
   # Grouping variable
-  if(!is.null(colour_group)) {
-    df.u$colour_group <- colour_group
-  }
-  
-  if(!is.null(shape_group)) {
-    df.u$shape_group <- shape_group
+  if(!is.null(colour.group)) {
+    df.u$colour.group <- colour.group
   }
 
   # Variable Names
@@ -172,30 +167,26 @@ ggbiplot <- function(pcobj, choices = 1:2, scale = 1, pc.biplot = TRUE,
 
   # Draw either labels or points
   if(!is.null(df.u$labels)) {
-    if(!is.null(df.u$colour_group)) {
-      g <- g + geom_text(aes(label = labels, color = colour_group), 
+    if(!is.null(df.u$colour.group)) {
+      g <- g + geom_text(aes(label = labels, color = colour.group), 
                          size = labels.size)
     } else {
       g <- g + geom_text(aes(label = labels), size = labels.size)      
     }
   } else {
-    if(!is.null(df.u$colour_group)&!is.null(df.u$shape_group)) {
-      g <- g + geom_point(aes(color = colour_group,shape=shape_group), alpha = alpha)
-    } else if (!is.null(df.u$colour_group)){
-      g <- g + geom_point(aes(color = colour_group), alpha = alpha)
-    } else if (!is.null(df.u$shape_group)){
-      g <- g + geom_point(aes(shape=shape_group), alpha = alpha)
+    if(!is.null(df.u$colour.group)) {
+      g <- g + geom_point(aes(color = colour.group), alpha = alpha)
     } else {
       g <- g + geom_point(alpha = alpha)      
     }
   }
 
   # Overlay a concentration ellipse if there are groups
-  if(!is.null(df.u$colour_group) && ellipse) {
+  if(!is.null(df.u$colour.group) && ellipse) {
     theta <- c(seq(-pi, pi, length = 50), seq(pi, -pi, length = 50))
     circle <- cbind(cos(theta), sin(theta))
 
-    ell <- ddply(df.u, 'colour_group', function(x) {
+    ell <- ddply(df.u, 'colour.group', function(x) {
       if(nrow(x) <= 2) {
         return(NULL)
       }
@@ -203,10 +194,10 @@ ggbiplot <- function(pcobj, choices = 1:2, scale = 1, pc.biplot = TRUE,
       mu <- c(mean(x$xvar), mean(x$yvar))
       ed <- sqrt(qchisq(ellipse.prob, df = 2))
       data.frame(sweep(circle %*% chol(sigma) * ed, 2, mu, FUN = '+'), 
-                 colour_group = x$colour_group[1])
+                 colour.group = x$colour.group[1])
     })
     names(ell)[1:2] <- c('xvar', 'yvar')
-    g <- g + geom_path(data = ell, aes(color = colour_group, group = colour_group))
+    g <- g + geom_path(data = ell, aes(color = colour.group, group = colour.group))
   }
 
   # Label the variable axes
