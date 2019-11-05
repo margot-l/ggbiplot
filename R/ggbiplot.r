@@ -179,7 +179,7 @@ ggbiplot <- function(pcobj, choices = 1:2, scale = 1, pc.biplot = TRUE,
       g <- g + geom_text(aes(label = labels), size = labels.size)      
     }
   } else {
-    if(!is.null(df.u$colour_group)&df.u$shape_group)) {
+    if(!is.null(df.u$colour_group)&!is.null(df.u$shape_group)) {
       g <- g + geom_point(aes(color = colour_group,shape=shape_group), alpha = alpha)
     } else if (!is.null(df.u$colour_group){
       g <- g + geom_point(aes(color = colour_group), alpha = alpha)
