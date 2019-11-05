@@ -181,9 +181,9 @@ ggbiplot <- function(pcobj, choices = 1:2, scale = 1, pc.biplot = TRUE,
   } else {
     if(!is.null(df.u$colour_group)&!is.null(df.u$shape_group)) {
       g <- g + geom_point(aes(color = colour_group,shape=shape_group), alpha = alpha)
-    } else if (!is.null(df.u$colour_group){
+    } else if (!is.null(df.u$colour_group)){
       g <- g + geom_point(aes(color = colour_group), alpha = alpha)
-    } else if (!is.null(df.u$shape_group){
+    } else if (!is.null(df.u$shape_group)){
       g <- g + geom_point(aes(,shape=shape_group), alpha = alpha)
     } else {
       g <- g + geom_point(alpha = alpha)      
